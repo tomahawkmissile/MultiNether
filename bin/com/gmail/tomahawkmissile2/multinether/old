@@ -1,0 +1,85 @@
+	@EventHandler
+	public void onPortalEnter(PlayerMoveEvent e) {
+		Player p = e.getPlayer();
+		Location l = p.getLocation();
+		World nether = this.getServer().getWorld(p.getWorld().getName()+"_nether");
+		World end = this.getServer().getWorld(p.getWorld().getName()+"_the_end");
+		if(p.getWorld().getEnvironment()==Environment.NORMAL) {
+			if(l.getBlock().getType()==Material.PORTAL) {
+				p.teleport(this.getSafeY(nether, l.getX(), l.getZ(), 0));
+				this.constructNetherPortal(p);
+			} else if(l.getBlock().getType()==Material.ENDER_PORTAL) {
+				p.teleport(end.getSpawnLocation());
+			}
+		} else {
+			String ss[] = p.getWorld().getName().split("_");
+			World norm = this.getServer().getWorld(ss[0]);
+			if(l.getBlock().getType()==Material.PORTAL) {
+				p.teleport(this.getSafeY(norm, l.getX(), l.getZ(), 48));
+				this.constructNetherPortal(p);
+			} else if(l.getBlock().getType()==Material.ENDER_PORTAL) {
+				p.teleport(norm.getSpawnLocation());
+			}
+		}
+	}
+	public void constructNetherPortal(Player p) {
+		Location l = p.getLocation();
+		World w = p.getWorld();
+		int min = -10;
+		int max = 10;
+		boolean cancel = false;
+		for(int x1 = min; x1<max; x1++) {
+			for(int y1 = min; y1<max; y1++) {
+				for(int z1 = min; z1<max; z1++) {
+					if(l.getBlock().getRelative(x1,y1,z1).getType()==Material.PORTAL) {
+						cancel = true;
+					}
+				}
+			}
+		}
+		if(!cancel) {
+			double x = l.getX()-1.0;
+			double y = l.getY();
+			double z = l.getZ()-1.0;
+			new Location(w,x,y,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+1.0,y,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+2.0,y,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+3.0,y,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x,y+1.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x,y+2.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x,y+3.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x,y+4.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+3.0,y+1.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+3.0,y+2.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+3.0,y+3.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+3.0,y+4.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+2.0,y+4.0,z).getBlock().setType(Material.OBSIDIAN);
+			new Location(w,x+1.0,y+4.0,z).getBlock().setType(Material.OBSIDIAN);
+					
+			new Location(w,x+2.0,y+1.0,z).getBlock().setType(Material.FIRE);
+		}
+	}
+	public Location getSafeY(World w, double x, double z, double minY) {
+		Location l;
+		for(int y=256;y>=minY;--y) {
+			l = new Location(w,x-1.0,y,z-1.0);
+			switch(l.getBlock().getType()) {
+			case LAVA:
+			case AIR:
+			case LEAVES:
+			case BEDROCK:
+				break;
+			default:
+				Location l1 = l.add(0, 1, 0);
+				if(l1.getBlock().getType()==Material.AIR) {
+					return l;
+				}
+				break;
+			}
+		}
+		Random r = new Random();
+		double a = r.nextDouble()*8.0;
+		double b = r.nextDouble()*8.0;
+		this.getSafeY(w, x+a, z+b, minY);
+		return null;
+	}

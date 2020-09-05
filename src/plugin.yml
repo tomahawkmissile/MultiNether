@@ -1,0 +1,6 @@
+name: MultiNether
+author: Tomahawkmissile
+main: com.gmail.tomahawkmissile2.multinether.Main
+description: Fixes nether for multiple worlds.
+version: 1.0
+api-version: 1.15
